@@ -1,86 +1,106 @@
+#include <SPI.h>
 
 #include <SoftwareSerial.h>
-SoftwareSerial GSM(8, 7); // RX, TX
-int smokeA0 = A5;
+#include <TinyGPS++.h>
 
-int sensorThres = 320;
-boolean sent = false;
+const byte rxPin = 2;
+const byte txPin = 3;
+static const int RXPin = 4, TXPin = 5;
+static const uint32_t GPSBaud = 9600;
 
-void readStuff(){
-  Serial.write(GSM.read());
-}
+TinyGPSPlus gps;
+
+SoftwareSerial ss(RXPin, TXPin);
+
+SoftwareSerial Wifi (rxPin, txPin);    
 
 
-void sendGSM(const char* msg, int waitMs = 1000) {
-  GSM.println(msg);
-  delay(waitMs);
- 
-}
+const int smokePin = A0;
+int smoke;
+String c;
 
+void printResponse() {
+  
+
+  while (Wifi.available()) {
+    Serial.println(Wifi.readStringUntil('\n')); 
+  }
+}      
 
 void setup() {
-  GSM.begin(9600);
-  Serial.begin(9600);
-Serial.println("Setting Up.......");
-      sendGSM("AT+SAPBR=3,1,\"APN\",\"web.zain.ug.com\"");
-//  sendGSM("AT+SAPBR=3,1,\"APN\",\"yellopix.mtn.co.ug\"");
-      sendGSM("AT+SAPBR=1,1");
-      sendGSM("AT+HTTPINIT");  
-      sendGSM("AT+HTTPPARA=\"CID\",1");
-      sendGSM("AT+HTTPPARA=\"URL\",\"http://forestfirealert.herokuapp.com/log.php\"");
-      sendGSM("AT+HTTPACTION=0", 5000);
-      sendGSM("AT+HTTPACTION=0");
-      sendGSM("AT+HTTPACTION=0");
-      sendGSM("AT+HTTPREAD=0,100");
-    Serial.println("Started");
-//  pinMode(smokeA0, INPUT);
-//  pinMode(13,OUTPUT);
- delay(5000);
- Serial.println("Finishing Up.......");
+
+  Serial.begin(9600);   
+  Wifi.begin(115200);
+  ss.begin(GPSBaud);
+  delay(1000);
+
+//  while( c == ""){
+    Serial.println("Waiting for Location....");
+    delay(1000);
+      while (ss.available() > 0){
+    gps.encode(ss.read());
+    if (gps.location.isUpdated()){
+
+      c = String(gps.location.lat(), 6) + ", " + String(gps.location.lng(), 6);
+    }
 }
+//}
+  Serial.println("Location Achieved: " +c); 
+   Wifi.println("AT+CIPMUX=1");
+  delay(500);
+  printResponse();
 
+  Wifi.println("AT+CIPSTART=4,\"TCP\",\"192.168.43.167\",5000");
+  delay(1000);
+  printResponse();
+ 
+    String cmd = "GET /register_sensor?location="+ c +" HTTP/1.1";
+    Wifi.println("AT+CIPSEND=4," + String(cmd.length() + 4));
+    delay(500);
 
-void sendAlert(){
-  sendGSM("AT+HTTPPARA=\"URL\",\"http://forestfirealert.herokuapp.com/report_fire.php\""); 
-  sendGSM("AT+HTTPACTION=0", 3000);
-  //sendGSM("AT+HTTPACTION=0");
-  sendGSM("AT+HTTPREAD=0,100");
+    Wifi.println(cmd);
+    delay(1000);
+    Wifi.println(""); 
+//  }
+
+  if (Wifi.available()) {
+    Serial.write(Wifi.read());
   
+  Serial.println("Done SetUP!!"); 
+
   
-  delay(5000);
-  sent = true;
+}
 }
 
-void logIn(){
-   sendGSM("AT+HTTPPARA=\"URL\",\"http://forestfirealert.herokuapp.com/log.php\"");
-   sendGSM("AT+HTTPACTION=0", 3000);
-   sendGSM("AT+HTTPREAD=0,100");
-   delay(5000);
-}
 
 
 void loop() {
+  
+  smoke = analogRead(smokePin);
+//  
+//  Serial.println(smoke);
 
-  logIn();
-   while(GSM.available()) 
-    Serial.write(GSM.read());
 
-  while (Serial.available()){
-    GSM.write(Serial.read());
+  Wifi.println("AT+CIPMUX=1");
+  delay(500);
+  Serial.write(Wifi.read());
+  printResponse();
+
+  Wifi.println("AT+CIPSTART=4,\"TCP\",\"192.168.43.167\",5000");
+  delay(1000);
+  printResponse();
+
+    String cmd = "GET /log?smoke="+ String(smoke) +" HTTP/1.1";
+    Wifi.println("AT+CIPSEND=4," + String(cmd.length() + 4));
+    delay(500);
+
+    Wifi.println(cmd);
+    delay(1000);
+    Wifi.println(""); 
+//  }
+
+  if (Wifi.available()) {
+    Serial.write(Wifi.read());
   }
-  int analogSensor = analogRead(smokeA0);
-  Serial.println(analogSensor);
-  // Checks if it has reached the threshold value
-  if (analogSensor > sensorThres)
-  {
-   if(!sent){
-    Serial.println("FIRE ON THE MOUNTAIN RUN RUN RUN !!!!!!");
-   sendAlert();
-   }
-  }else{
-    digitalWrite(13,LOW);
-  }
-
-
 
 }
