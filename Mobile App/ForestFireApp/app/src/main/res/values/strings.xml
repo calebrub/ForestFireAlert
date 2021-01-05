@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Forest Fire Alert</string>
+    <string name="online">Determining.....</string>
+    <string name="google_maps_key">AIzaSyCKrsltCHk2oiytFDv0TJwh6WqGj33BkLI</string>
+</resources>

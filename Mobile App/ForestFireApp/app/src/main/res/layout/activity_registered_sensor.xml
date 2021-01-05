@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RegisteredSensor">
+
+
+    <ImageView
+        android:id="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/real_top" />
+
+    <RelativeLayout
+        android:layout_below="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:layout_marginTop="8dp">
+
+        <ImageView
+            android:id="@+id/one"
+            android:layout_width="100dp"
+            android:padding="4dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/one" />
+
+        <TextView
+            android:id="@+id/active_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:text="@string/online"
+            android:layout_marginLeft="105dp"
+            android:layout_marginTop="15dp"
+            android:textColor="#C08E07" />
+
+        <Button
+            android:id="@+id/get_direction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:textSize="13dp"
+            android:text="SEE LOCATION"
+
+            android:layout_marginLeft="105dp"
+            android:textColor="#673AB7" />
+
+
+
+    </androidx.cardview.widget.CardView>
+
+    </RelativeLayout>
+
+
+
+</RelativeLayout>

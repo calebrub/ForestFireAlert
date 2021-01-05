@@ -1,0 +1,5 @@
+<root>
+    <item name='kong.unirest.JsonNode'>
+        <annotation name='java.lang.Deprecated' />
+    </item>
+</root>

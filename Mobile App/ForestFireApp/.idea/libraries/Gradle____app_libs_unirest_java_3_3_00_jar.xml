@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: ./app/libs/unirest-java-3.3.00.jar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/libs/unirest-java-3.3.00.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
