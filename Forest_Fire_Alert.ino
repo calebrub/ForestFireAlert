@@ -41,7 +41,7 @@ void setup() {
     gps.encode(ss.read());
     if (gps.location.isUpdated()){
 
-      c = String(gps.location.lat(), 6) + ", " + String(gps.location.lng(), 6);
+      c = String(gps.location.lat(), 6) + "," + String(gps.location.lng(), 6);
     }
 }
 //}
@@ -77,9 +77,6 @@ void setup() {
 void loop() {
   
   smoke = analogRead(smokePin);
-//  
-//  Serial.println(smoke);
-
 
   Wifi.println("AT+CIPMUX=1");
   delay(500);
@@ -90,14 +87,22 @@ void loop() {
   delay(1000);
   printResponse();
 
-    String cmd = "GET /log?smoke="+ String(smoke) +" HTTP/1.1";
+    String cmd = "GET /log?smoke="+ String(smoke) +"&location="+c+" HTTP/1.1";
     Wifi.println("AT+CIPSEND=4," + String(cmd.length() + 4));
     delay(500);
 
     Wifi.println(cmd);
     delay(1000);
     Wifi.println(""); 
-//  }
+
+     while (ss.available() > 0){
+    gps.encode(ss.read());
+    if (gps.location.isUpdated()){
+
+      c = String(gps.location.lat(), 6) + "," + String(gps.location.lng(), 6);
+    }
+     }
+
 
   if (Wifi.available()) {
     Serial.write(Wifi.read());
